@@ -9,6 +9,7 @@ export const meta = {
     { title: 'Test Design', detail: 'Design test cases before implementation' },
     { title: 'Code', detail: 'Implementation orchestrator (manages parallelism internally)' },
     { title: 'QA', detail: 'Automated tests + logical walkthrough + test quality audit' },
+    { title: 'E2E Verification', detail: 'Launch app, Playwright browser testing, visual + functional verification' },
     { title: 'Final Check', detail: 'Three-dimensional verification + fix loop' },
   ],
 }
@@ -80,6 +81,42 @@ const QA_SCHEMA = {
     },
   },
   required: ['all_passed', 'summary', 'issues'],
+}
+
+const E2E_SCHEMA = {
+  type: 'object',
+  properties: {
+    passed: { type: 'boolean' },
+    project_type: { type: 'string', enum: ['web', 'cli', 'api', 'library'] },
+    visual_issues: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          severity: { type: 'string', enum: ['critical', 'major', 'minor'] },
+          component: { type: 'string' },
+          issue: { type: 'string' },
+          fix_suggestion: { type: 'string' },
+        },
+        required: ['severity', 'component', 'issue', 'fix_suggestion'],
+      },
+    },
+    functional_issues: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          severity: { type: 'string', enum: ['critical', 'major', 'minor'] },
+          flow: { type: 'string' },
+          issue: { type: 'string' },
+          fix_suggestion: { type: 'string' },
+        },
+        required: ['severity', 'flow', 'issue', 'fix_suggestion'],
+      },
+    },
+    verdict: { type: 'string' },
+  },
+  required: ['passed', 'project_type', 'visual_issues', 'functional_issues', 'verdict'],
 }
 
 const FINAL_CHECK_SCHEMA = {
@@ -315,7 +352,50 @@ After fixing, run the full test suite to verify.${DIR_INSTRUCTION}`,
   }
 }
 
-// === Phase 8: Final Three-Dimensional Check + Fix Loop ===
+// === Phase 8: E2E Verification (Playwright) ===
+phase('E2E Verification')
+log('E2E verification — launching app and testing with Playwright...')
+
+let e2ePassed = false
+let e2eRound = 0
+
+while (!e2ePassed && e2eRound <= MAX_ROUNDS) {
+  e2eRound++
+
+  const e2e = await agent(
+    `Read your instructions from ${PROMPTS_DIR}/visual-qa.md.
+${e2eRound > 1 ? `This is E2E round ${e2eRound}. Previous round found issues — they should be fixed now.` : ''}
+Read docs/spec.md, docs/design.md for expected behavior and visual design.
+Determine project type, set up Playwright if needed, start the app, and verify both visual quality and functional user flows.${DIR_INSTRUCTION}`,
+    { label: `e2e:round-${e2eRound}`, schema: E2E_SCHEMA }
+  )
+
+  if (e2e.passed) {
+    e2ePassed = true
+    log(`E2E verification passed (round ${e2eRound})`)
+  } else if (e2eRound > MAX_ROUNDS) {
+    log(`E2E still has issues after ${MAX_ROUNDS} fix rounds. Proceeding to final check.`)
+  } else {
+    const issues = [...(e2e.visual_issues || []), ...(e2e.functional_issues || [])]
+    const critical = issues.filter(i => i.severity === 'critical').length
+    log(`E2E round ${e2eRound}: ${issues.length} issues (${critical} critical). Fixing...`)
+    await agent(
+      `Fix these E2E verification issues found by Playwright testing.
+
+Visual issues:
+${(e2e.visual_issues || []).map(i => `- [${i.severity}] ${i.component}: ${i.issue}\n  Fix: ${i.fix_suggestion}`).join('\n')}
+
+Functional issues:
+${(e2e.functional_issues || []).map(i => `- [${i.severity}] ${i.flow}: ${i.issue}\n  Fix: ${i.fix_suggestion}`).join('\n')}
+
+After fixing, run the test suite to confirm no regressions.
+MANDATORY: run "git add -A && git commit" with a descriptive message before finishing.${DIR_INSTRUCTION}`,
+      { label: `e2e-fixer:round-${e2eRound}` }
+    )
+  }
+}
+
+// === Phase 9: Final Three-Dimensional Check + Fix Loop ===
 phase('Final Check')
 log('Three-dimensional verification...')
 
@@ -376,13 +456,15 @@ MANDATORY: run "git add -A && git commit" with a descriptive message before fini
 }
 
 // === Done ===
-log(`Pipeline ${finalPassed && testsPassed ? 'PASSED' : 'COMPLETED'}. ${args.request}`)
+log(`Pipeline ${finalPassed && testsPassed && e2ePassed ? 'PASSED' : 'COMPLETED'}. ${args.request}`)
 
 return {
   request: args.request,
   tests_passed: testsPassed,
   test_rounds: testRound,
+  e2e_passed: e2ePassed,
+  e2e_rounds: e2eRound,
   final_check_passed: finalPassed,
   final_check_rounds: finalRound,
-  passed: testsPassed && finalPassed,
+  passed: testsPassed && e2ePassed && finalPassed,
 }
