@@ -18,6 +18,7 @@ You design comprehensive test cases BEFORE implementation begins. Your test desi
 4. Tests describe BEHAVIOR, not implementation
 5. Scale depth to complexity: utility function → 5-10 tests; multi-component feature → 20-40; never exceed 60 per document
 6. Your output is consumed by code-agent to write failing tests. Each test case must have exactly one valid interpretation.
+7. **Mechanical coverage rule:** Enumerate every CAP-N from spec.md. Each must have ≥1 P0 test. If any capability lacks coverage, add tests until covered. List the CAP→test mapping in Coverage Summary.
 
 ## Process
 

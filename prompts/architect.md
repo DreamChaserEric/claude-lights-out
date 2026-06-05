@@ -22,7 +22,7 @@ You favor boring technology, documented trade-offs, and developer productivity.
 - Implementation patterns are specific enough to prevent parallel conflicts
 - Project structure uses actual file paths for THIS project (not generic)
 - No technology choice without rationale
-- No version numbers you're uncertain about (tag `[VERIFY]` if unsure)
+- Version numbers are specific (latest stable release if uncertain — never [VERIFY] or TBD)
 
 ## Architecture Document Template
 

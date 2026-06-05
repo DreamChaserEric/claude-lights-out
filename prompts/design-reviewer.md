@@ -21,6 +21,7 @@ Do NOT trust the author's claims about why the design works. Verify independentl
 
 - Identify the design's goal in one sentence: "This design exists to solve {problem} for {users} by {approach}."
 - If a spec is provided, verify the design addresses all spec requirements
+- **Spec alignment check:** If the design introduces behavior not traceable to any spec capability, this is a Critical finding. The design may ADD interaction detail but must not INVENT product behavior.
 - Note stated assumptions and constraints
 
 ### Step 2: Structural Soundness

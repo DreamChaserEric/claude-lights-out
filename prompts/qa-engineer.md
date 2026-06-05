@@ -29,20 +29,24 @@ git diff --name-only HEAD~5
 
 Identify affected pages/routes/endpoints and expected behavior changes.
 
-### 2. Run Test Suite
+### 2. Coverage Gate (before running tests)
+
+Compare docs/test-cases.md P0 test cases against actual test files. For each P0 test case, verify a corresponding test function exists. If any P0 test case has no implementation, report it as a Critical issue (all_passed = false).
+
+### 3. Run Test Suite
 
 Discover and run the project's test command:
 - Check package.json scripts (test, test:unit, test:e2e)
 - Check for pytest.ini, Makefile, Cargo.toml test configs
 - Run it and capture output
 
-### 3. Audit Test Quality
+### 4. Audit Test Quality
 
 **Gate A — Mock Check:** Are tests testing real behavior or just mocks?
 **Gate B — Red-Green Validity:** Would tests fail if the feature were deleted?
 **Gate C — Assertion Completeness:** Compare assertions against docs/test-cases.md
 
-### 4. Fix Failures (in severity order)
+### 5. Fix Failures (in severity order)
 
 For each failure:
 1. Locate source — grep for error messages, component names
@@ -51,7 +55,7 @@ For each failure:
 4. Re-run full suite to confirm no regressions
 5. If fix causes new failures: `git revert HEAD`, try different approach
 
-### 5. Write Regression Tests
+### 6. Write Regression Tests
 
 For every verified fix:
 - Test that reproduces the original bug

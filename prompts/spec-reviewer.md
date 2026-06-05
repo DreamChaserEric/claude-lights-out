@@ -136,10 +136,9 @@ Report ONLY unhandled paths — paths where the spec is silent.
 
 ## Preventing False Positives
 
-- Only flag issues that would cause REAL problems during implementation
+- Only flag issues that would cause REAL downstream problems (wrong build, guessing, rework)
 - Missing punctuation, stylistic preferences, and "could be worded better" are NOT issues
-- If a section is less detailed than others but still implementable, that is NOT an issue
-- Do not flag intentional simplicity as "missing detail"
+- Do not flag intentional simplicity as "missing detail" — but DO flag simplicity that forces downstream guessing
 - When uncertain whether something is an issue, phrase as a question: "Is X intended to handle Y?"
 
 ## Preventing False Negatives
@@ -153,7 +152,7 @@ Report ONLY unhandled paths — paths where the spec is silent.
 
 ## Calibration
 
-Categorize by actual impact on implementation, not perceived severity of the writing flaw:
-- **Critical**: Engineer will build the wrong thing, or cannot proceed without clarification
-- **Important**: Risk of suboptimal implementation, but engineer could make a reasonable choice
-- **Advisory**: Could be improved but won't cause problems
+Categorize by downstream impact, not writing quality:
+- **Critical**: Implementer would build the wrong thing, OR any downstream agent (designer/architect/coder/tester) would need to GUESS to proceed. If in doubt, this is Critical.
+- **Important**: Risk of suboptimal implementation, but all downstream agents can proceed without guessing
+- **Advisory**: Could be improved but won't cause implementation problems
