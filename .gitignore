@@ -1,0 +1,10 @@
+# Internal development artifacts
+competitors/
+examples/
+CONTINUATION.md
+
+# OS
+.DS_Store
+
+# Node (from test projects)
+node_modules/
