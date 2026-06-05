@@ -34,7 +34,7 @@ Result: Production code + spec.md + design.md + architecture.md + test-cases.md
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/claude-lights-out/claude-lights-out/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/DreamChaserEric/claude-lights-out/main/install.sh | bash
 ```
 
 ## Usage

@@ -2,7 +2,7 @@
 set -e
 
 DEST="$HOME/.claude/lights-out"
-REPO="https://github.com/claude-lights-out/claude-lights-out"
+REPO="https://github.com/DreamChaserEric/claude-lights-out"
 
 echo "🔧 claude-lights-out installer"
 echo ""

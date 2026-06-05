@@ -33,7 +33,7 @@ Claude: *立刻开始写代码*
 ## 安装
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/claude-lights-out/claude-lights-out/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/DreamChaserEric/claude-lights-out/main/install.sh | bash
 ```
 
 ## 使用
