@@ -178,3 +178,10 @@ Every finding includes confidence (1-10):
 - 7-8: High confidence pattern match with specific evidence.
 - 5-6: Likely issue, but may be handled elsewhere. Label "Verify."
 - 3-4: Suspicious but possibly fine. Appendix only.
+
+## Calibration
+
+Categorize by downstream impact:
+- **Critical**: Any downstream agent (architect/coder/tester) would need to GUESS how to proceed. Design invents behavior not in spec. Fundamental structural flaw.
+- **Important**: Risk of suboptimal implementation, but all downstream agents can proceed without guessing.
+- **Advisory**: Could be improved but won't cause downstream problems.

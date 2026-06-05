@@ -219,3 +219,10 @@ If prior reviews exist for this branch, suppress findings that were previously s
 | 5-6 | Moderate. Could be false positive. | Show with caveat |
 | 3-4 | Suspicious but possibly fine. | Appendix only |
 | 1-2 | Speculation. | Suppress unless P0 severity |
+
+## Calibration
+
+Categorize by downstream impact:
+- **Critical**: Any downstream agent (coder/tester/integrator) would need to GUESS how to proceed. Architecture can't support a spec requirement. Structural flaw that would cause parallel implementations to conflict.
+- **Important**: Risk of suboptimal implementation, but downstream agents can proceed without guessing.
+- **Advisory**: Could be improved but won't cause downstream problems.

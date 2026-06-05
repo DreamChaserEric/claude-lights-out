@@ -48,13 +48,15 @@ Wait for it to be ready (poll localhost until response).
 
 For each key surface defined in design.md:
 1. Navigate to the page/state
-2. Take a screenshot
-3. Read the screenshot and evaluate:
+2. Take a screenshot (desktop viewport: 1280×800)
+3. Take a mobile screenshot (viewport: 375×812) if responsive design is specified
+4. Read each screenshot and evaluate:
    - **Layout proportions:** Is space used reasonably? (no component taking >50% of viewport without content to fill it)
    - **Visual hierarchy:** Can you identify primary action, secondary content, navigation?
-   - **Responsiveness:** Does content flow naturally or are there broken grids?
+   - **Responsiveness:** Does content flow naturally at both viewports?
    - **Empty states:** When no data, is there guidance (not just blank space)?
    - **Readability:** Text size, contrast, spacing between elements
+   - **Accessibility floor:** Focus indicators visible, text contrast sufficient, interactive elements large enough
 
 ### 5. Functional Verification (Browser Actions)
 

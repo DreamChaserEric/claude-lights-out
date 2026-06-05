@@ -97,7 +97,8 @@ You produce specs so precise that an unfamiliar implementer can execute without 
 
 | Section | Hobby | Production |
 |---------|-------|------------|
-| Capabilities | 1-3 items | Complete with all edge cases |
-| NFRs | 1-2 rows | Full table |
-| Error behaviors | One line each | Full taxonomy |
+| Capabilities | 1-3 items, happy path + 1 edge per CAP | Complete with all edge cases and Given/When/Then |
+| NFRs | 1-2 rows, estimates OK | Full table, precise thresholds |
+| Error behaviors | One line each | Full taxonomy with exact codes/messages |
+| Constraints | Exact values required at all levels | Exact values required |
 | Testing Plan | "Unit tests" | Full pyramid |
