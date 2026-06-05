@@ -15,10 +15,8 @@ else
   git clone --depth 1 "$REPO" "$DEST"
 fi
 
-mkdir -p "$HOME/.claude/workflows" "$HOME/.claude/commands"
+mkdir -p "$HOME/.claude/commands"
 
-ln -sf "$DEST/lightsout-workflow.js" "$HOME/.claude/workflows/lightsout-workflow.js"
-ln -sf "$DEST/retrospective-workflow.js" "$HOME/.claude/workflows/lightsout-retrospective.js"
 ln -sf "$DEST/lightsout.md" "$HOME/.claude/commands/lightsout.md"
 ln -sf "$DEST/lightsout-retro.md" "$HOME/.claude/commands/lightsout-retro.md"
 
@@ -31,4 +29,4 @@ echo "  /lightsout Fix: the search endpoint returns stale results"
 echo "  /lightsout-retro  Review the last pipeline run quality"
 echo ""
 echo "Update later:  cd $DEST && git pull"
-echo "Uninstall:     rm -rf $DEST ~/.claude/workflows/lightsout-workflow.js ~/.claude/workflows/lightsout-retrospective.js ~/.claude/commands/lightsout.md ~/.claude/commands/lightsout-retro.md"
+echo "Uninstall:     rm -rf $DEST ~/.claude/commands/lightsout.md ~/.claude/commands/lightsout-retro.md"

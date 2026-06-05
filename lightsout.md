@@ -108,7 +108,7 @@ After brainstorming (or immediately if launching without it), construct a struct
 
 ```
 Workflow({
-  name: "lightsout-workflow",
+  scriptPath: "~/.claude/lights-out/lightsout-workflow.js",
   args: {
     request: "<original request + key clarifications in natural language>",
     brief: <structured brief object>
