@@ -1,12 +1,16 @@
 # claude-lights-out
 
+[English](README.md) | [中文](README-zh.md)
+
 **Lights-out development. One sentence in, production code out.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > "Lights-out manufacturing" — a factory so automated it runs with the lights off. No humans needed.
 
-claude-lights-out brings that to software development. Give it one sentence. It runs an entire engineering team's process — spec, design, architecture, code review, TDD implementation, QA — and hands you production-ready code with full documentation.
+A [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) that enforces a rigorous, non-negotiable software engineering pipeline. No phase can be skipped. No shortcut is possible. Every artifact is reviewed by an independent agent before proceeding.
+
+Give it one sentence. It executes the full lifecycle — spec, design, architecture, consistency review, test design, TDD implementation, QA, three-dimensional verification — and hands you production-ready code with persistent documentation that survives across sessions.
 
 ## Before / After
 

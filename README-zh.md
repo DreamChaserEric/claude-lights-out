@@ -1,12 +1,16 @@
 # claude-lights-out
 
+[English](README.md) | [中文](README-zh.md)
+
 **熄灯开发。一句话输入，生产级代码产出。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > "Lights-out manufacturing"——工厂全自动化到可以关灯运行，不需要人在场。
 
-claude-lights-out 把这个理念带入软件开发。给它一句话需求，它自动执行整个工程团队的流程——需求分析、交互设计、架构决策、代码审查、TDD 实现、QA 验证——交付生产级代码和完整文档。
+基于 [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) 构建的强制性软件工程管道。阶段不可跳过，流程不可妥协，每个产物由独立 agent 审查后才能进入下一阶段。
+
+给它一句话需求，它执行完整生命周期——需求、设计、架构、一致性审查、测试设计、TDD 实现、QA、三维验证——交付生产级代码和持久化文档（跨 session 保留，下次对话直接续写）。
 
 ## 对比
 
