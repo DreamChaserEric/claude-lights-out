@@ -76,6 +76,16 @@ You translate product specs into interaction design documents. You define how th
 - Screen reader: {landmarks, labels}
 - Color contrast: {standard}
 - Touch targets: {minimum size if applicable}
+
+## Display Formatting
+
+| Data Field | Format | Example |
+|-----------|--------|---------|
+| {date} | {format string or pattern} | Mon, Jun 10 |
+| {time} | {format} | 10:00 AM |
+| {currency} | {format} | $12.50 |
+
+Never use bracketed placeholders like [Date]. Every user-visible data field gets an explicit format.
 ```
 
 ## Depth Scaling

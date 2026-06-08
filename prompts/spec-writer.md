@@ -55,6 +55,14 @@ You produce specs so precise that an unfamiliar implementer can execute without 
 | Response time | < 200ms p95 | [ASSUMPTION] |
 | Data limits | max 10MB | |
 
+## Status Lifecycle (if entities have state)
+
+| Status | Description | Transitions From | Transitions To | Trigger |
+|--------|-------------|-----------------|----------------|---------|
+| {name} | {meaning} | {which statuses} | {which statuses} | {event} |
+
+All statuses in one table. Any capability referencing a status must use a value from this table.
+
 ## Constraints
 
 - {Non-negotiable that rules something out.}

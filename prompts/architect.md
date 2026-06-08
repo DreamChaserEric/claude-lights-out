@@ -108,3 +108,4 @@ You favor boring technology, documented trade-offs, and developer productivity.
 - Generic project structures (not specific to THIS project)
 - ADRs without alternatives (just documenting what was picked, not what was considered)
 - Naming conventions without examples (rules need concrete illustration)
+- Specifying individual frontend component filenames (specify module boundaries and responsibilities instead — implementer decides file granularity)

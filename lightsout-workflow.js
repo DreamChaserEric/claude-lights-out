@@ -297,12 +297,12 @@ Read ${PROMPTS_DIR}/code-agent.md for TDD implementation rules.
 Read ${PROMPTS_DIR}/task-splitter.md for task decomposition approach.
 
 Your process:
-1. Decompose into parallel-safe tasks (FILE OWNERSHIP RULE: no two parallel tasks touch the same file)
-2. Execute tasks — use parallel sub-agents for independent work
-3. Follow TDD: write failing test → implement → verify pass
+1. CREATE TEST SKELETONS FIRST: For every P0 test case in docs/test-cases.md, create the test file with a failing test. Commit these failing tests. This is the gate — no implementation code before failing tests exist.
+2. Decompose into parallel-safe tasks (FILE OWNERSHIP RULE: no two parallel tasks touch the same file)
+3. Implement code to make tests pass. Use parallel sub-agents for independent work.
 4. If blocked: adjust approach, retry with different strategy
-5. VERIFICATION: after all tasks, run the FULL test suite and confirm zero failures
-6. MANDATORY COMMIT: you MUST run "git add -A && git commit" with a descriptive message before finishing. This is not optional.
+5. VERIFICATION: run the FULL test suite and confirm zero failures
+6. MANDATORY COMMIT: run "git add -A && git commit" with a descriptive message before finishing.
 
 You have full autonomy over HOW. The documents define WHAT.
 Report: what was implemented, test results, any issues.${DIR_INSTRUCTION}`,
@@ -395,63 +395,77 @@ MANDATORY: run "git add -A && git commit" with a descriptive message before fini
   }
 }
 
-// === Phase 9: Final Three-Dimensional Check + Fix Loop ===
+// === Phase 9: Final Check (frozen gap list, max 3 fix rounds) ===
 phase('Final Check')
 log('Three-dimensional verification...')
 
-let finalPassed = false
-let finalRound = 0
-
-while (!finalPassed && finalRound <= MAX_ROUNDS) {
-  finalRound++
-
-  const finalCheck = await agent(
-    `Read your instructions from ${PROMPTS_DIR}/consistency-reviewer.md.
+// Round 1: full scan, freeze the gap list
+const initialCheck = await agent(
+  `Read your instructions from ${PROMPTS_DIR}/consistency-reviewer.md.
 Scope: doc-vs-code. Perform three-dimensional verification:
 
-COMPLETENESS:
-- Every CAP in docs/spec.md has corresponding implementation code
-- Every test case in docs/test-cases.md has a corresponding automated test
-- No requirements were dropped
+COMPLETENESS: Every CAP has implementation + test. No requirements dropped.
+CORRECTNESS: Implementation matches spec intent. Edge cases handled. Error behaviors correct.
+COHERENCE: Architecture module boundaries match actual structure. Naming consistent.
 
-CORRECTNESS:
-- Implementation matches spec INTENT (not just letter)
-- Edge cases from test-cases.md are handled in code
-- Error behaviors match spec definitions
+Only report REAL gaps verified by reading actual code — not hypothetical concerns.
+Prioritize: correctness bugs > completeness gaps > coherence drift.${DIR_INSTRUCTION}`,
+  { label: 'final-check:scan', schema: FINAL_CHECK_SCHEMA }
+)
 
-COHERENCE:
-- docs/architecture.md file structure matches actual project structure (ls the directories)
-- Naming conventions are consistent throughout code
-- Design patterns match architecture decisions
+let finalPassed = initialCheck.passed
+const frozenGaps = initialCheck.gaps || []
 
-For each gap found: specify the dimension, which requirement, what's missing, which files to change, and what action to take.
-Only report REAL gaps verified by reading actual code — not hypothetical concerns.${DIR_INSTRUCTION}`,
-    { label: `final-check:round-${finalRound}`, schema: FINAL_CHECK_SCHEMA }
-  )
+if (finalPassed) {
+  log('Final check passed (round 1)')
+} else {
+  log(`Final check: ${frozenGaps.length} gaps found. Fixing (gap list frozen)...`)
 
-  if (finalCheck.passed) {
-    finalPassed = true
-    log(`Final check passed (round ${finalRound})`)
-  } else if (finalRound > MAX_ROUNDS) {
-    log(`Final check: gaps remain after ${MAX_ROUNDS} fix rounds. Completing.`)
-  } else {
-    const gapCount = finalCheck.gaps.length
-    log(`Final check round ${finalRound}: ${gapCount} gaps. Fixing...`)
+  // Fix rounds: only address the frozen gap list, verify each gap closes
+  let fixRound = 0
+  const MAX_FIX_ROUNDS = 3
+
+  while (!finalPassed && fixRound < MAX_FIX_ROUNDS) {
+    fixRound++
+
     await agent(
-      `Fix these verification gaps. Read docs/spec.md for requirements.
+      `Fix these verification gaps. The gap list is FROZEN — only fix these items, nothing else.
 
 Gaps to fix:
-${finalCheck.gaps.map(g => `- [${g.dimension}] ${g.requirement}: ${g.gap}\n  Files: ${g.affected_files.join(', ')}\n  Action: ${g.action}`).join('\n\n')}
+${frozenGaps.map(g => `- [${g.dimension}] ${g.requirement}: ${g.gap}\n  Files: ${g.affected_files.join(', ')}\n  Action: ${g.action}`).join('\n\n')}
 
-For each gap:
-1. If it's a missing test → write the test (TDD: fail first, then implement if needed)
-2. If it's wrong behavior → fix the implementation
-3. If it's a doc/code mismatch → update the doc OR the code (spec is truth for behavior, code is truth for structure)
-
-After fixing, run the full test suite to confirm no regressions.
-MANDATORY: run "git add -A && git commit" with a descriptive message before finishing.${DIR_INSTRUCTION}`,
-      { label: `final-fixer:round-${finalRound}` }
+Rules:
+1. Only touch files listed in affected_files for each gap
+2. After each fix, run tests. If tests fail, revert that change immediately.
+3. If a gap cannot be fixed without breaking tests, mark it as unresolvable and move on.
+4. MANDATORY: run "git add -A && git commit" before finishing.${DIR_INSTRUCTION}`,
+      { label: `final-fixer:round-${fixRound}` }
     )
+
+    // Verify: only check if the ORIGINAL gaps are closed (no new scanning)
+    const recheck = await agent(
+      `Read your instructions from ${PROMPTS_DIR}/consistency-reviewer.md.
+Scope: doc-vs-code. You are re-verifying SPECIFIC gaps from a previous round.
+
+ONLY check these previously-identified gaps (do NOT scan for new issues):
+${frozenGaps.map(g => `- [${g.dimension}] ${g.requirement}: ${g.gap}`).join('\n')}
+
+For each gap: verify if it is now CLOSED or still OPEN by reading the actual code/docs.
+Report passed=true only if ALL gaps are closed.${DIR_INSTRUCTION}`,
+      { label: `final-recheck:round-${fixRound}`, schema: FINAL_CHECK_SCHEMA }
+    )
+
+    if (recheck.passed) {
+      finalPassed = true
+      log(`Final check passed after ${fixRound} fix round(s)`)
+    } else {
+      const remaining = (recheck.gaps || []).length
+      log(`Final check: ${remaining}/${frozenGaps.length} gaps remain after fix round ${fixRound}`)
+    }
+  }
+
+  if (!finalPassed) {
+    log(`Final check: some gaps remain after ${MAX_FIX_ROUNDS} fix rounds. Completing.`)
   }
 }
 
@@ -465,6 +479,6 @@ return {
   e2e_passed: e2ePassed,
   e2e_rounds: e2eRound,
   final_check_passed: finalPassed,
-  final_check_rounds: finalRound,
+  final_check_gaps_found: frozenGaps.length,
   passed: testsPassed && e2ePassed && finalPassed,
 }
