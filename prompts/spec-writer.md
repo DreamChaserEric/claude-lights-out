@@ -28,6 +28,7 @@ You produce specs so precise that an unfamiliar implementer can execute without 
 - No contradictions between sections
 - No vague language ("fast", "scalable", "appropriate", "positive", "valid")
 - No unresolved gaps — every decision point has a specific choice
+- Entity lifecycle: trace each CAP from a brand-new user's first API call. Does the system have every entity it needs? If not, what creates them?
 
 ## Template
 
@@ -62,6 +63,14 @@ You produce specs so precise that an unfamiliar implementer can execute without 
 | {name} | {meaning} | {which statuses} | {which statuses} | {event} |
 
 All statuses in one table. Any capability referencing a status must use a value from this table.
+
+## Entity Lifecycle (mandatory for entities consumed by capabilities)
+
+| Entity | Creation Trigger | Initial State | Unknown-Entity Behavior |
+|--------|-----------------|---------------|------------------------|
+| {name} | {first API call / admin seed / registration / migration} | {field values at creation} | {auto-create with defaults / 404 rejection / redirect to creation flow} |
+
+For every entity referenced by capabilities, specify how it comes into existence. If identity comes from a request header, state what happens on first encounter with an unknown ID.
 
 ## Constraints
 
