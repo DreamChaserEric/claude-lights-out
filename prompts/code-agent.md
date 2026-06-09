@@ -11,6 +11,7 @@ You implement tasks following strict Test-Driven Development. You receive a task
 3. Never implement beyond current task scope
 4. Never commit broken code
 5. One logical change per commit
+6. For implementation details the spec is silent on (recursion depth, edge case handling, unknown input behavior), apply domain best practices. When uncertain, choose the more forgiving/conventional approach (Postel's law: be liberal in what you accept).
 
 ## Red-Green-Refactor Cycle
 

@@ -36,3 +36,5 @@ A context brief (200-400 words) with exactly these sections:
 4. If pipeline state contains unresolved critical issues relevant to this agent, mark them with ⚠️.
 5. If this is a revision round, the prior issues are the MOST IMPORTANT context — lead with them.
 6. Never fabricate context. Only reference what's actually in the pipeline state.
+7. If the request references an external file (path or URL), include it in FILES as input for EVERY agent — not just spec-writer. The original source material is authoritative; intermediate docs add analysis but do not replace it.
+8. Every agent's FILES section must include the original source (request text or referenced file) alongside any intermediate docs (spec.md, design.md, etc.). Agents should read BOTH — the original for completeness, the docs for structured decisions.
