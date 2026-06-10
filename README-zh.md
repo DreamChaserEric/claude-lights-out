@@ -6,29 +6,20 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> "Lights-out manufacturing"——工厂全自动化到可以关灯运行，不需要人在场。
+基于 [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) 的全自动开发管道。给一句需求，交付可运行的、测试过的代码和持久化文档。
 
-基于 [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) 构建的强制性软件工程管道。阶段不可跳过，流程不可妥协，每个产物由独立 agent 审查后才能进入下一阶段。
+## 为什么
 
-给它一句话需求，它执行完整生命周期——需求、设计、架构、一致性审查、测试设计、TDD 实现、QA、三维验证——交付生产级代码和持久化文档（跨 session 保留，下次对话直接续写）。
+用 AI Agent 写代码（vibe coding）有四个未解决的问题：
 
-## 对比
+| 问题 | 现状 | lights-out 怎么解 |
+|------|------|------------------|
+| **不可控** | Agent 跳过测试、忽略边界、偷工减料 | 固定 9 阶段管道，每阶段必跑，不可跳过 |
+| **黑盒** | Agent 跑了 20 分钟，不知道到哪了 | Claude workflow board 实时显示阶段进度 |
+| **耗费人脑** | 你测→找 bug→报→Agent 修→循环 | Agent 完成设计+测试+QA 全循环后才交付 |
+| **上下文丢失** | 换 session 或 compact 后，Agent 忘了一切 | 强制维护文档（spec+design+arch），跨 session 持久 |
 
-**没有结构**（普通 Claude Code 使用）：
-```
-你: "做个 URL 缩短器"
-Claude: *立刻开始写代码*
-结果: 能跑但……没文档、没设计记录、没测试策略、没审查、架构随意。
-      下次对话从零开始。
-```
-
-**用 lights-out**：
-```
-你: /lightsout 用 Express 和 Redis 做个 URL 缩短服务
-流水线: 需求→设计→架构→审查→测试设计→并行TDD→QA→一致性验证
-结果: 可用代码 + spec.md + design.md + architecture.md + test-cases.md
-      全部审查过。全部测试过。全部一致。跨 session 持久。
-```
+另外：**对抗性质量保证**——每个产物经过独立的 write → review → fix 循环。单个 Agent 不会找自己的 bug。
 
 ## 安装
 
@@ -36,80 +27,107 @@ Claude: *立刻开始写代码*
 curl -fsSL https://raw.githubusercontent.com/DreamChaserEric/claude-lights-out/main/install.sh | bash
 ```
 
+需要：[Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)（支持 workflow 功能）。
+
 ## 使用
 
 ```
-/lightsout 做一个 CSV 转 JSON 的命令行工具，支持流式处理
-/lightsout 给现有 API 加上限流功能
-/lightsout Fix: 搜索接口在缓存失效后返回旧数据
+/lightsout Build a CLI that converts CSV to JSON with streaming support
+/lightsout Add rate limiting to the existing API endpoints
+/lightsout Fix: search returns stale results after cache invalidation
 ```
 
-简单需求直接执行。复杂需求会问你：要不要讨论细节、选几个选项、还是直接开始。
+简单需求直接执行。模糊需求会快速 brainstorm（最多 3-5 个问题）。
 
 ## 执行流程
 
-```
-/lightsout <你的需求>
-     │
-     ▼
-[清晰度门控] ─── 简单需求直接跑。复杂需求快速 brainstorming。
-     │
-     ▼  (固定 8 阶段管道——每阶段必跑，agent 自判断深度)
-[需求编写 → 需求审查] ─── 独立 agent，对抗式审查
-     │
-     ▼
-[设计师 → 设计审查] ────── 每个审查员是全新 agent
-     │                      （不是自审，是独立审查）
-     ▼
-[架构师 → 架构审查] ────── 技术架构 + ADR
-     │
-     ▼
-[一致性审查] ──────────── 跨文档矛盾检测 + 修复
-     │
-     ▼
-[测试用例设计] ────────── 写代码前先设计测试
-     │
-     ▼
-[代码编排器] ────────────── 并行 TDD 实现
-     │
-     ▼
-[QA 工程师 → Bug 修复] ── 测试 + 修复循环（最多 5 轮）
-     │
-     ▼
-[最终检查 → 修复] ──────── 三维验证 + 修复循环（最多 5 轮）
-     │
-     ▼
-✓ 完成：代码 + 4 个 ground-truth 文档 + git commits
+```mermaid
+graph TD
+    A["/lightsout your request"] --> B{Complex?}
+    B -->|Simple| C[Launch pipeline]
+    B -->|Ambiguous| D[Quick brainstorm] --> C
+
+    C --> S1[Spec Writer ↔ Reviewer]
+    S1 --> S2[UX Designer ↔ Reviewer]
+    S2 --> S3[Architect ↔ Reviewer]
+    S3 --> S4[Consistency Check]
+    S4 --> S5[Test Case Design]
+    S5 --> S6[Code Orchestrator]
+    S6 --> S7[QA ↔ Bug Fixer]
+    S7 --> S8[E2E Verification]
+    S8 --> S9[Final Check ↔ Fixer]
+    S9 --> R[Done: code + docs + commits]
+
+    style S1 fill:#e1f5fe
+    style S2 fill:#e1f5fe
+    style S3 fill:#e1f5fe
+    style S6 fill:#e8f5e9
+    style S7 fill:#fff3e0
+    style S8 fill:#fff3e0
+    style S9 fill:#fff3e0
 ```
 
-## 核心设计
+每阶段必跑。Agent 自校准深度——bug fix 时文档阶段秒过，greenfield 项目全面展开。Code Orchestrator 自主决定是单人实现还是拆分并行。
 
-| 决策 | 原因 |
-|------|------|
-| 写和审分离（独立 agent） | 自审有盲点，独立审查抓住作者看不到的问题 |
-| 文档在代码前 | 防止"先写再想"，架构决策显式记录 |
-| 测试用例在实现前 | 没有测试设计的 TDD 是"事后补测试"的变体 |
-| 固定管道，不可跳过 | 8 阶段全跑，agent 自校准深度（bug fix 时文档阶段输出 "no changes"） |
-| 统一 5 轮上限 | 所有 check+fix 循环（审查、QA、最终检查）最多 5 轮，防止无限循环 |
-| Ground-truth 文档持久化 | `docs/` 文件跨 session 存在，不用重新解释上下文 |
-| 结构化 schema 传递 | 审查输出 `{approved, issues[]}`，QA 输出 `{all_passed, issues[{file, error, fix_hint}]}`——下游 agent 可直接执行 |
+## 架构
 
-## 状态
+**三层分离：**
 
-早期发布。管道在中小型项目（CLI 工具、库）上端到端运行，零人工介入。大型项目和正式 benchmark（SWE-bench）结果即将到来。
+| 层 | 职责 | 位置 |
+|----|------|------|
+| 编排层 | 阶段顺序、循环控制、状态累积 | `lightsout-workflow.js` |
+| 角色层 | Agent 身份、能力、行为规则 | `prompts/*.md` |
+| 情景层 | 为每个 agent 生成上下文摘要 | Supervisor agent |
+
+**Supervisor** 读取完整管道状态 + worker 的角色定义，生成聚焦的 context brief。Worker 看到：角色指令 + supervisor 摘要 + 用户原始输入。
+
+## 设计原则
+
+- **写和审分离** — 独立 agent 审查，抓住作者看不到的问题
+- **文档是 ground truth** — `spec.md`, `design.md`, `architecture.md` 跨 session 持久
+- **职责清晰** — spec 管行为，design 管交互，arch 管技术结构
+- **信息不丢失** — 模板是引导不是约束，agent 保留所有相关输入
+- **优先级链** — 原始输入 > architecture > spec > 领域知识
+- **先测试后代码** — 测试用例在实现前设计，驱动 TDD
+
+## 产出
+
+Pipeline 运行后，你的项目包含：
+
+```
+docs/
+  spec.md           # 产品规格（能力、场景、错误处理）
+  design.md         # 交互设计（UX 流程、状态、反馈）
+  architecture.md   # 技术架构（ADR、结构、契约）
+  test-cases.md     # 实现前设计的测试计划
+src/                # 可运行的、测试过的代码
+tests/              # 完整测试套件（先于代码编写）
+```
+
+这些文档是项目的记忆。下次 session，任何 agent 都能读取它们继续工作。
 
 ## 定制
 
-每个 agent 的行为由 `~/.claude/lights-out/prompts/*.md` 定义，直接编辑即可定制。
+编辑 `~/.claude/lights-out/prompts/` 下的任何 prompt：
 
-## 方法论来源
+```
+supervisor.md          # 上下文合成规则
+spec-writer.md         # 产品规格
+ux-designer.md         # 交互设计
+architect.md           # 技术架构
+code-agent.md          # 编排器 + TDD 实现
+test-case-designer.md  # 测试设计原则
+qa-engineer.md         # 质量验证
+visual-qa.md           # E2E 验证
++ reviewer/fixer prompts
+```
 
-基于开源社区验证过的最佳实践组装（非闭门造车）：
+## 限制
 
-- **BMAD-METHOD**: ADR 格式、对抗审查、stakes 分级
-- **Superpowers**: TDD 铁律、brainstorming 门控
-- **GSD**: 任务拆分、文件所有权
-- **Harper Reed**: 离散循环、极简文档
+- 需要 Claude Code 且支持 workflow（Max plan）
+- 每次运行 30-50 个 agent call，取决于项目复杂度
+- 最适合中小型 greenfield 项目和明确范围的功能
+- 不替代生产系统的人工 code review
 
 ## License
 
