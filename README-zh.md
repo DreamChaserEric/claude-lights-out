@@ -2,11 +2,11 @@
 
 [English](README.md) | [中文](README-zh.md)
 
-**熄灯开发。一句话输入，生产级代码产出。**
+**结构化工程循环，不是一把梭。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-基于 [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) 的全自动开发管道。给一句需求，交付可运行的、测试过的代码和持久化文档。
+基于 [Claude Code dynamic workflow](https://docs.anthropic.com/en/docs/claude-code) 的全自动开发流水线。Agent 在循环中编写、审查、测试、修复——交付可运行的代码和跨 session 持久化的文档。
 
 ## 为什么
 

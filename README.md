@@ -2,11 +2,11 @@
 
 [English](README.md) | [中文](README-zh.md)
 
-**One sentence in, production code out.**
+**Structured engineering loops, not one-shot vibes.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A fully automated development pipeline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Give it a requirement — it delivers working, tested code with persistent documentation.
+A fully automated development pipeline for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Agents write, review, test, and fix in loops — delivering working code with persistent documentation that survives across sessions.
 
 ## Why
 
