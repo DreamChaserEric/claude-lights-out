@@ -41,6 +41,8 @@ Simple requests launch immediately. Ambiguous requests get a quick brainstorm (3
 
 ## How It Works
 
+![Workflow Board](assets/workflow-board.jpg)
+
 ```mermaid
 graph TD
     A["/lightsout your request"] --> B{Complex?}

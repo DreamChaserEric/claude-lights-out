@@ -41,6 +41,8 @@ curl -fsSL https://raw.githubusercontent.com/DreamChaserEric/claude-lights-out/m
 
 ## 执行流程
 
+![Workflow Board](assets/workflow-board.jpg)
+
 ```mermaid
 graph TD
     A["/lightsout your request"] --> B{Complex?}
