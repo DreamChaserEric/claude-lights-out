@@ -124,7 +124,7 @@ visual-qa.md           # E2E verification
 
 ## Limitations
 
-- Requires Claude Code with workflow support (Max plan)
+- Requires Claude Code with workflow support
 - Each run uses 30-50 agent calls depending on project complexity
 - Best suited for small-to-medium greenfield projects and well-scoped features
 - Not a replacement for human code review on production systems

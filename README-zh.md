@@ -124,7 +124,7 @@ visual-qa.md           # E2E 验证
 
 ## 限制
 
-- 需要 Claude Code 且支持 workflow（Max plan）
+- 需要 Claude Code 且支持 workflow
 - 每次运行 30-50 个 agent call，取决于项目复杂度
 - 最适合中小型 greenfield 项目和明确范围的功能
 - 不替代生产系统的人工 code review
